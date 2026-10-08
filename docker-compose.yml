@@ -1,0 +1,20 @@
+﻿services:
+  edge-quality-sorter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: edge_quality_sorter
+    restart: always
+    network_mode: "host"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - BELT_SPEED_MMS=1200.0
+      - ACTUATOR_POSITION_MM=500.0
+      - NOMINAL_RADIUS_PX=60.0
+      - DIMENSION_TOLERANCE=0.05
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
