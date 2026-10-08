@@ -50,18 +50,32 @@ This system solves that by implementing an **Industrial 2-Tier Architecture**:
 ```
 
 [ Physical World ]
-```mermaid
-flowchart TD
-    PW["Physical World: Photoelectric Beam Break"] -->|Hardware TTL Trigger| CAM["Industrial Camera"]
-    PW -->|Part Presence| PLC["Industrial PLC Layer<br/>• Line Velocity Tracking<br/>• Hardware Encoder Ticks<br/>• Millisecond Actuation"]
-    
-    CAM -->|Frame Acquired via DMA / HAL| EDGE["Edge Vision Computer<br/>• Otsu & Black-Hat Morphology<br/>• Dimensional Check (±5%)<br/>• Anomaly Segmentation (<7 ms)"]
-    
-    EDGE -->|OPC-UA Handshake Verdict<br/>Last_Verdict_Pass = FALSE<br/>Last_Defect_Code = Surface_Pitting_or_Crack<br/>Edge_Watchdog_Heartbeat| PLC
-    
-    PLC -->|Deterministic Strike Window| SOL["Downstream Ejection Solenoid<br/>High-speed pneumatic burst deflects reject part"]
+## 🏗 System Architecture
 
+```text
+[ Physical Sensor / Beam Break ]
+       |
+       +--(Hardware TTL Trigger)--------> [ Industrial Camera ]
+       |                                          |
+       | (Part Arrival)                           | (Frame DMA via HAL)
+       v                                          v
+[ Industrial PLC Layer ]               [ Edge Vision Computer ]
+  - Encoder mm Tracking                  - Otsu & Morphology (<7 ms)
+  - Belt Velocity Sync                   - Dimensional Tolerance Check
+  - Ejection Timing                      - Surface Crack/Pit Detection
+       ^                                          |
+       |                                          |
+       +<---- OPC-UA Register Handshake ----------+
+              - Last_Verdict_Pass
+              - Last_Defect_Code
+              - Edge_Watchdog_Heartbeat
+       |
+       v
+[ Downstream Pneumatic Solenoid ]
+  └── High-speed air pulse deflects defective part into reject bin.
 ```
+    
+  
 
 ---
 
